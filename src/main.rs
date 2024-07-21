@@ -1,33 +1,28 @@
-fn main(){
+use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use actix_cors::Cors;
+use serde::Serialize;
 
-    let x=5u32;
-    //u32 값으로 생성
-    let y={
-        let x_squerd=x*x;
-        let x_cube=x_squerd*x;
-
-        x_cube+x_squerd+x_cube
-        //리턴값을 위해 세미콜론을 생략한다
-    };
-
-    let z={
-        2*x;
-        //세미콜론이 있을경우 리턴값이 없음 () 반환
-    };
-
-    println!("x is{:?}",x);
-    println!("y is{:?}",y);
-    println!("z is{:?}",z);
-
+#[derive(Serialize)]
+struct Message {
+    text: String,
 }
 
-// struct Person{
-//     name:String,
-//     age:u32,
-// }
-//구조체
+#[get("/message")]
+async fn get_message() -> impl Responder {
+    let message = Message {
+        text: "Hello from Rust API!".to_string(),
+    };
+    HttpResponse::Ok().json(message)
+}
 
-const MAX_POINTS:u32 = 100_000;
-//아래 하이픈은 컴파일에서 읽지않고 순수 사람이 숫자를 구분하기편하게해줌
-//변수 선언시 사용여부에 따라서 앞에써준다 예)_MAX_POINTS 사용되는부분이 없을때 => 메모리변수할당이안됨
-//사용될때 => MAX_POINTS println!("{},MAX_POINTS")
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .wrap(Cors::permissive()) // 개발 환경에서만 사용. 실제 환경에서는 더 엄격한 CORS 설정 필요
+            .service(get_message)
+    })
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
+}
