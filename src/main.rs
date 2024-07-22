@@ -2,7 +2,7 @@ use actix_web::{App, HttpServer};
 use actix_cors::Cors;
 use dotenv::dotenv;
 use std::env;
-mod api {
+pub mod api {
     pub mod message;
     pub mod search;
 }
